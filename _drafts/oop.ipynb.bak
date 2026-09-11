@@ -1,0 +1,176 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": []
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "source": [
+        "# Part A: Dataset Inspection\n",
+        "\n",
+        "## 1. Dataset Dimensions and Overview\n",
+        "- **Number of Observations (Rows):** 4,630\n",
+        "- **Number of Features (Columns):** 9\n",
+        "- **Storage Profile:** All 9 fields are loaded initially as generic `object` (string) types, requiring deliberate type conversion and parsing for numerical, datetime, and categorical representations.\n",
+        "\n",
+        "| Column Name | Initial Dtype | Intended Semantic Type | Description / Measurement Level |\n",
+        "| :--- | :--- | :--- | :--- |\n",
+        "| **`Company`** | `object` | Categorical (Nominal) | Organization or state entity conducting the mission. |\n",
+        "| **`Location`** | `object` | Categorical (Nominal) | Composite text string containing launch site, facility, and country. |\n",
+        "| **`Date`** | `object` | Datetime | Calendar launch date (`YYYY-MM-DD`). |\n",
+        "| **`Time`** | `object` | Datetime / Time | Launch timestamp in UTC (`HH:MM:SS`). |\n",
+        "| **`Rocket`** | `object` | Categorical (Nominal) | Specific launch vehicle system / model designation. |\n",
+        "| **`Mission`** | `object` | Categorical (Identifier) | Specific payload / mission project name. |\n",
+        "| **`RocketStatus`** | `object` | Categorical (Binary) | Vehicle operational status as of August 2022 (`Active` vs. `Retired`). |\n",
+        "| **`Price`** | `object` | Numerical (Continuous) | Reported rocket launch cost in millions of USD. |\n",
+        "| **`MissionStatus`** | `object` | Categorical (Target) | Final mission outcome (`Success`, `Failure`, `Partial Failure`, `Prelaunch Failure`). |\n",
+        "\n",
+        "---\n",
+        "\n",
+        "## 2. Missing Values and Duplicate Observations Audit\n",
+        "- **Duplicate Observations:** Exactly **1 duplicate row** was identified (Index 3530 and 3531: CASC / Long March 2D / 2008-11-05), which will be removed during cleaning to avoid artificial weight.\n",
+        "- **Missingness Profile:**\n",
+        "  - **`Price`:** Missing **3,365 values (72.68%)**. Imputing over 70% of a feature risks introducing severe noise and false precision; following standard preprocessing guidelines, dropping this column is recommended.\n",
+        "  - **`Time`:** Missing **127 values (2.74%)**.\n",
+        "  - **Other 7 Columns:** `Company`, `Location`, `Date`, `Rocket`, `Mission`, `RocketStatus`, and `MissionStatus` contain 0 missing values (100% complete).\n",
+        "\n",
+        "---\n",
+        "\n",
+        "## 3. High-Cardinality, Identifier, and Outlier Inspection\n",
+        "- **`Mission` Column:** Displays 4,556 unique names across 4,630 rows (98.4% unique). It serves as a unique transaction identifier rather than an informative predictive feature and will not generalize across modeling tasks.\n",
+        "- **`Rocket` Column:** Contains 370 distinct rocket families. While informative, many rockets appear only once or twice, requiring grouping or target encoding to manage cardinality.\n",
+        "\n",
+        "---\n",
+        "\n",
+        "## 4. Identification of Target Variable and Candidate Input Features\n",
+        "- **Possible Target Variable:** `MissionStatus`.\n",
+        "  - For supervised classification, it will be collapsed into a binary outcome: **`Success` (4,162 rows, 89.89%)** vs. **`Not-Success` (468 rows, 10.11%)**.\n",
+        "- **Viable Candidate Features ($X$):**\n",
+        "  - `Company` (organizational reliability and history).\n",
+        "  - `Country` (extracted from `Location` to represent launch geography and infrastructure).\n",
+        "  - `Launch_Year` (extracted from `Date` to capture technological era and operational maturity).\n",
+        "  - `Rocket` (vehicle family architecture).\n",
+        "- **Excluded Features:**\n",
+        "  - `Price` (discarded due to 72.7% missingness).\n",
+        "  - `Time` (lacks domain causal impact on structural flight success).\n",
+        "  - `Mission` (unique row identifier).\n",
+        "  - `RocketStatus` (excluded from predictive modeling to prevent temporal data leakage, as it reflects vehicle retirement status in 2022 rather than pre-flight conditions)."
+      ],
+      "metadata": {
+        "id": "elC8NtA1Bvat"
+      }
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "id": "0K0qnprAAOpF",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "outputId": "dd87d2a7-52a5-4a2a-a3ce-36e0dd933e32"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Dataset Dimensions: 4630 rows, 9 columns\n",
+            "\n",
+            "--- Missing Values Count ---\n",
+            "Time      127\n",
+            "Price    3365\n",
+            "dtype: int64\n",
+            "\n",
+            "Exact Duplicate Rows: 1\n",
+            "\n",
+            "--- Target Variable Distribution (MissionStatus) ---\n",
+            "                   Count Percentage\n",
+            "MissionStatus                      \n",
+            "Success             4162     89.89%\n",
+            "Failure              357      7.71%\n",
+            "Partial Failure      107      2.31%\n",
+            "Prelaunch Failure      4      0.09%\n"
+          ]
+        }
+      ],
+      "source": [
+        "import numpy as np\n",
+        "import pandas as pd\n",
+        "\n",
+        "# Load dataset while keeping raw reference intact\n",
+        "df_raw = pd.read_csv(\"space_missions.csv\", encoding=\"latin1\")\n",
+        "df = df_raw.copy()\n",
+        "\n",
+        "# Part A: Dataset Inspection Outputs\n",
+        "print(f\"Dataset Dimensions: {df.shape[0]} rows, {df.shape[1]} columns\")\n",
+        "print(\"\\n--- Missing Values Count ---\")\n",
+        "print(df.isna().sum()[df.isna().sum() > 0])\n",
+        "print(f\"\\nExact Duplicate Rows: {df.duplicated().sum()}\")\n",
+        "\n",
+        "# Target Variable Distribution\n",
+        "print(\"\\n--- Target Variable Distribution (MissionStatus) ---\")\n",
+        "status_dist = pd.DataFrame(\n",
+        "    {\n",
+        "        \"Count\": df[\"MissionStatus\"].value_counts(),\n",
+        "        \"Percentage\": (df[\"MissionStatus\"].value_counts(normalize=True) * 100)\n",
+        "        .round(2)\n",
+        "        .astype(str)\n",
+        "        + \"%\",\n",
+        "    }\n",
+        ")\n",
+        "print(status_dist)"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "### Part B — Define the Possible Machine-Learning Problem\n",
+        "\n",
+        "**Proposed Framework: Sequential Hybrid Strategy (Exploratory Clustering → Imbalanced Binary Classification)**\n",
+        "\n",
+        "This project adopts a two-stage sequential workflow where unsupervised clustering is conducted first as exploratory pattern discovery, with its structural findings directly informing the downstream classification pipeline.\n",
+        "\n",
+        "---\n",
+        "\n",
+        "#### Stage 1: Unsupervised Clustering (Exploratory Pattern Discovery)\n",
+        "* **Objective:** Discover how space missions naturally group across time and geography without imposing outcome labels.\n",
+        "* **Why the Dataset Fits:** The dataset spans 65 years (1957–2022) of geopolitical shifts and evolving space infrastructure. Grouping missions geometrically using standardized continuous variables (such as launch era) and encoded categorical variables (such as country of origin) identifies latent operational archetypes (e.g., early experimental programs vs. mature modern commercial operations).\n",
+        "* **Role in Pipeline:** Clustering functions as an unsupervised diagnostic step. It reveals whether launch era and site maturity create distinct operational risk profiles, guiding which engineered features are needed for prediction.\n",
+        "\n",
+        "---\n",
+        "\n",
+        "#### Stage 2: Supervised Classification (Pre-Launch Outcome Prediction)\n",
+        "* **Objective:** Predict whether a planned mission will result in a **Success (1)** or **Not-Success / Failure (0)** prior to liftoff.\n",
+        "* **Target Framing:** Collapses `MissionStatus` into a binary label: `Success` (89.89%) vs. `Not-Success` (10.11%, encompassing Failure, Partial Failure, and Prelaunch Failure).\n",
+        "* **How Clustering Informs Classification:**\n",
+        "  1. *Feature Derivation:* Discovered cluster boundaries validate engineering maturity features (e.g., historical launch era or cumulative operator experience).\n",
+        "  2. *Evaluation Awareness:* The exploratory clusters confirm that launch failures are heavily concentrated in earlier, less mature operational environments.\n",
+        "* **Handling Class Imbalance:** Due to the ~90/10 target distribution, raw accuracy is rejected as a performance metric. The classification stage will be evaluated using stratified train/test splits, Precision, Recall, PR-AUC, and the minority-class F1-Score."
+      ],
+      "metadata": {
+        "id": "hxEUAZI7GeKF"
+      }
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "bc2af558"
+      },
+      "source": [
+        "This code snippet uses the pandas library to load your CSV file into a DataFrame, which is a table-like data structure. The `display(df.head())` command then shows you the first five rows of your data, allowing for a quick preview."
+      ]
+    }
+  ]
+}
