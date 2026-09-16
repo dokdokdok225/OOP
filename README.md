@@ -10,13 +10,19 @@ references and activity guides.
 
 | Path | Description |
 | --- | --- |
-| `oop.ipynb` | **Main deliverable.** Part A (dataset inspection) and Part B (ML problem framing). |
-| `space_missions.csv` | Dataset used by the notebook (committed so the notebook runs anywhere). |
+| `oop.ipynb` | **Main deliverable.** The activity parts. Check the notebook itself for which parts are complete — this table goes stale as work progresses. |
+| `space_missions.csv` | Original raw Space Missions dataset. |
+| `space_missions_engineered.csv` | Readable engineered table with selected source fields, derived features, and binary target. |
 | `oop_rules.md` | Comprehensive OOP rules & architecture lecture reference. |
 | `data_preprocessing_notes_and_activity_guide.md` | Data preprocessing lecture notes + Phase 1 activity guide. |
 | `oop_preprocessing_notes.md` | Working notes on preprocessing decisions. |
 | `execute_notebook.py` | Helper to run the notebook headlessly. |
-| `_drafts/` | Build scripts and notebook backups (historic; not part of the deliverable). |
+| `activity_2_baseline_model.ipynb` | Activity 2 baseline classification notebook. |
+| `_docs/project_data_cheat_sheet.md` | End-to-end data-flow cheat sheet: raw CSV → engineered features → `X`/`y` → saved arrays. |
+| `_docs/model_fit_research.md` | Research and empirical comparison of suitable classification models. |
+| `_drafts/` | Build scripts and notebook backups. These **are tracked in git** so no work is lost, but they are scratch files — not graded material. |
+| `build_part_*.py` | Scratch scripts that generate notebook sections. Also scratch, not graded. |
+| `main..py` | Empty file (0 bytes). The double dot in the name is a typo; harmless, left untouched. |
 
 ## Getting started
 

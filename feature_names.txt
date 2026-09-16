@@ -1,0 +1,46 @@
+Launch_Year
+Month_Sin
+Month_Cos
+Company_Prior_Launches
+Company_Prior_Failure_Rate
+Company_Arianespace
+Company_Blue Origin
+Company_Boeing
+Company_CASC
+Company_ExPace
+Company_General Dynamics
+Company_IAI
+Company_ILS
+Company_ISA
+Company_ISAS
+Company_ISRO
+Company_Kosmotras
+Company_Lockheed
+Company_MHI
+Company_Martin Marietta
+Company_NASA
+Company_Northrop
+Company_RVSN USSR
+Company_Rocket Lab
+Company_Roscosmos
+Company_Sea Launch
+Company_SpaceX
+Company_Starsem
+Company_ULA
+Company_US Air Force
+Company_US Navy
+Company_VKS RF
+Company_infrequent_sklearn
+Country_China
+Country_France
+Country_India
+Country_Iran
+Country_Israel
+Country_Japan
+Country_Kazakhstan
+Country_New Zealand
+Country_Pacific Ocean
+Country_Russia
+Country_Usa
+Country_infrequent_sklearn
+Rocket_Freq
