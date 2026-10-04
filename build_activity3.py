@@ -439,13 +439,15 @@ md("""### Improvement assessment (Part E requirement)
 | Held-out evaluation count | once in Activity 2 | once in Activity 3 |
 
 The tuned random forest **improved the primary metric by +0.0752** (0.3463 → 0.4215), a ~22%
-relative gain — non-trivial, because (i) the ensemble ranked above the tree across the five
-validation folds in Part C, (ii) precision rose 36% while still catching 55 of 94 true
-Not-Success missions (vs 58 under the tree), and (iii) accuracy rose 0.7635 → 0.8369.
+relative gain — non-trivial, because (i) the ensemble achieved the **highest mean validation
+F1, leading the tree in four of the five folds** (noticeable fold variability, not a clean
+sweep), (ii) precision rose 36% while still catching 55 of 94 true Not-Success missions
+(vs 58 under the tree), and (iii) accuracy rose 0.7635 → 0.8369. A more complex or aggressive
+loss-screening configuration is therefore justified by evidence, not assumed.
 
 **One explicit trade-off:** the tuned ensemble gives up a little *recall* (0.6170 → 0.5851)
 to buy *precision* (0.2407 → 0.3293): it now makes 112 false alarms instead of the tree's
-roughly 166, while missing 39 of 94 real failures. In risk terms, the improved model raises
+183, while missing 39 of 94 real failures (the tree missed 36). In risk terms, the improved model raises
 more trustworthy failure alerts rather than many noisy ones — but it lets 39 real failures
 slip past where the tree missed only 36.""",
 ),
