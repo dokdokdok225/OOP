@@ -184,12 +184,10 @@ The final model remains an **academic prototype for retrospective risk classific
 
 ## 8. Recommendations and Future Improvements
 
-*(oracle ranking will confirm/adjust these)*
-
 1. **Chronological holdout.** Re-run with a time-based split (train ≤ cutoff year, test after) and measure F1 drift. This directly tests whether 0.4215 reflects genuine forward-predictive ability or partly retrospective memory of past eras.
 2. **Vehicle-maturity features.** Add a first-flight/vehicle-age indicator: the error analysis shows both false alarms and missed failures concentrate on debut or low-history vehicles that current features cannot describe.
 3. **Operating-threshold tuning and calibration analysis.** Replace reliance on the default 0.5 threshold with precision–recall curve analysis, selecting a threshold by the practical cost of false alarms versus missed failures, and evaluate calibration so predicted probabilities become meaningful risk estimates rather than mere labels.
-4. **Longer term:** collect richer mission data (cost, payload, weather) and evaluate probability calibration (reliability curves) so alerts carry calibrated risk, not just labels.
+4. **Longer term:** collect richer mission data (cost, payload, weather) so the features stop being proxies; combine with the calibration work above so alerts carry calibrated risk, not just labels.
 
 ---
 
